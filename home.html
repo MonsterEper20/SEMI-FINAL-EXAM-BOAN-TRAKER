@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BaonTracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <h1><span class="accent">Baon</span>Tracker</h1>
+</header>
+
+<section class="card">
+  <h2>+ NEW SAVINGS GOAL</h2>
+  <div class="goal-form">
+    <input type="text" id="goal" placeholder="e.g. iPhone 16">
+    <input type="number" id="amount" placeholder="e.g. 5000">
+    <button onclick="addGoal()">Add</button>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section class="card">
+  <h3>SUMMARY</h3>
+  <div class="summary">
+    <div class="summary-box">
+      <p>Total Goals</p>
+      <h2 id="totalGoals">0</h2>
+    </div>
+
+    <div class="summary-box">
+      <p>Total Saved</p>
+      <h2 id="totalSaved">₱0</h2>
+    </div>
+
+    <div class="summary-box">
+      <p>Total Target</p>
+      <h2 id="totalTarget">₱0</h2>
+    </div>
+
+    <div class="summary-box">
+      <p>Progress</p>
+      <h2 id="overallProgress">0%</h2>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h3>MY GOALS</h3>
+  <div id="goalsList"></div>
+</section>
+
+<script>
+async function loadGoals() {
+  const res = await fetch("/goals");
+  const data = await res.json();
+  const list = document.getElementById("goalsList");
+  list.innerHTML = "";
+
+  let totalSaved = 0;
+  let totalTarget = 0;
+
+  data.forEach(g => {
+    const percent = Math.min((g.saved / g.target) * 100, 100);
+
+    totalSaved += g.saved;
+    totalTarget += g.target;
+
+    list.innerHTML += `
+      <div class="goal-item">
+        <div class="goal-header">
+          <strong>${g.name}</strong>
+          <span>₱${g.saved} / ₱${g.target}</span>
+        </div>
+
+        <div class="progress-bar">
+          <div class="progress" style="width:${percent}%"></div>
+        </div>
+
+        <div class="add-save">
+          <input type="number" id="save-${g.id}" placeholder="₱ amount">
+          <button onclick="saveMoney(${g.id})">+ Add</button>
+          <button onclick="deleteGoal(${g.id})">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+
+  // SUMMARY
+  const totalGoals = data.length;
+  const overallPercent = totalTarget ? Math.round((totalSaved / totalTarget) * 100) : 0;
+
+  document.getElementById("totalGoals").innerText = totalGoals;
+  document.getElementById("totalSaved").innerText = `₱${totalSaved}`;
+  document.getElementById("totalTarget").innerText = `₱${totalTarget}`;
+  document.getElementById("overallProgress").innerText = `${overallPercent}%`;
+}
+
+async function addGoal() {
+  const goal = document.getElementById("goal").value;
+  const amount = document.getElementById("amount").value;
+
+  if (!goal || !amount) {
+    alert("Fill all fields");
+    return;
+  }
+
+  await fetch("/goals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: goal,
+      target: amount
+    })
+  });
+
+  document.getElementById("goal").value = "";
+  document.getElementById("amount").value = "";
+
+  loadGoals();
+}
+
+async function saveMoney(id) {
+  const value = document.getElementById(`save-${id}`).value;
+
+  if (!value) {
+    alert("Enter amount");
+    return;
+  }
+
+  await fetch(`/goals/${id}`, {
+    method: "PUT",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ value })
+  });
+
+  loadGoals();
+}
+
+async function deleteGoal(id) {
+  await fetch(`/goals/${id}`, {
+    method: "DELETE"
+  });
+
+  loadGoals();
+}
+
+loadGoals();
+</script>
+
+</body>
+</html>

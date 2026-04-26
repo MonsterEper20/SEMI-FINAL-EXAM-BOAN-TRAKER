@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(#0f1720, #0b0f14);
+  color: white;
+}
+
+.topbar {
+  padding: 20px 40px;
+}
+
+.accent {
+  color: #f5a623;
+}
+
+.card {
+  background: #141a22;
+  margin: 20px 40px;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #222;
+}
+
+.goal-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.goal-form input {
+  padding: 10px;
+  background: #1b222b;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 6px;
+}
+
+.goal-form button {
+  padding: 10px 15px;
+  background: #f5a623;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.goal-item {
+  margin-top: 20px;
+  padding: 15px;
+  background: #1b222b;
+  border-radius: 8px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  background: #333;
+  height: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 8px;
+  background: #f5a623;
+  transition: 0.3s;
+}
+
+.add-save {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.add-save input {
+  padding: 8px;
+  background: #141a22;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 6px;
+}
+
+.add-save button {
+  padding: 8px 12px;
+  background: #f5a623;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* SUMMARY */
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.summary-box {
+  background: #1b222b;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.summary-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.summary-box h2 {
+  margin: 5px 0 0;
+  color: #f5a623;
+}
