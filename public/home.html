@@ -20,7 +20,7 @@
 
 <!-- WEEK -->
 <section class="card">
-  <h2>WEEKLY LOG</h2>
+  <h2>WEEK LOG</h2>
   <input id="weekLabel" placeholder="Week label">
   <input id="allowance" type="number" placeholder="Allowance">
   <input id="spent" type="number" placeholder="Spent">
@@ -42,19 +42,20 @@
   </div>
 </section>
 
-<!-- GOALS LIST -->
+<!-- GOALS -->
 <section class="card">
   <h3>GOALS</h3>
   <div id="goalList"></div>
 </section>
 
-<!-- WEEK LIST -->
+<!-- WEEKS -->
 <section class="card">
-  <h3>WEEK LOGS</h3>
+  <h3>WEEKS</h3>
   <div id="weekList"></div>
 </section>
 
 <script>
+// ================= INIT =================
 async function loadAll(){
   loadGoals();
   loadWeeks();
@@ -72,25 +73,49 @@ async function loadGoals(){
   data.forEach(g=>{
     list.innerHTML += `
       <div class="goal-item">
-        <b>${g.name}</b>
+
+        <div class="goal-header">
+          <b>${g.name}</b>
+          <span>${g.progressPercent.toFixed(1)}%</span>
+        </div>
+
+        <div class="gauge">
+          <div class="gauge-fill" style="width:${g.progressPercent}%"></div>
+        </div>
+
         <p>₱${g.currentAmount} / ₱${g.targetAmount}</p>
 
-        <input id="g-${g.id}" type="number">
+        <input id="g-${g.id}" type="number"
+          oninput="preview(${g.id}, ${g.currentAmount}, ${g.targetAmount})"
+          placeholder="Add money">
+
         <button onclick="addMoney(${g.id})">Add</button>
         <button onclick="deleteGoal(${g.id})">Delete</button>
+
+        <div id="p-${g.id}" class="preview"></div>
+
       </div>
     `;
   });
 }
 
-async function addGoal(){
-  const name = goal.value;
-  const targetAmount = Number(amount.value);
+function preview(id, current, target){
+  const val = Number(document.getElementById(`g-${id}`).value);
+  let percent = ((current + val) / target) * 100;
+  if(percent > 100) percent = 100;
 
+  document.getElementById(`p-${id}`).innerText =
+    val ? `After add: ${percent.toFixed(1)}%` : "";
+}
+
+async function addGoal(){
   await fetch("/goals", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({name, targetAmount})
+    body: JSON.stringify({
+      name: goal.value,
+      targetAmount: Number(amount.value)
+    })
   });
 
   loadAll();
@@ -135,15 +160,15 @@ async function loadWeeks(){
 }
 
 async function addWeek(){
-  const weekLabel = document.getElementById("weekLabel").value;
-  const allowance = Number(document.getElementById("allowance").value);
-  const spent = Number(document.getElementById("spent").value);
-  const saveTarget = Number(document.getElementById("saveTarget").value);
-
   await fetch("/weeks", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({weekLabel, allowance, spent, saveTarget})
+    body: JSON.stringify({
+      weekLabel: weekLabel.value,
+      allowance: Number(allowance.value),
+      spent: Number(spent.value),
+      saveTarget: Number(saveTarget.value)
+    })
   });
 
   loadAll();

@@ -8,25 +8,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// =====================
-// DATA
-// =====================
+// ===================== DATA =====================
 let goals = [];
 let weeks = [];
 
 let goalId = 1;
 let weekId = 1;
 
-// =====================
-// FRONTEND ROUTE (HOME.HTML NOW)
-// =====================
+// ===================== FRONTEND =====================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/home.html"));
 });
 
-// =====================
-// GOALS
-// =====================
+// ===================== GOALS =====================
 app.get("/goals", (req, res) => {
   res.json(goals);
 });
@@ -34,7 +28,9 @@ app.get("/goals", (req, res) => {
 app.post("/goals", (req, res) => {
   const { name, targetAmount } = req.body;
 
-  if (!name) return res.status(400).json({ error: "Goal name required" });
+  if (!name)
+    return res.status(400).json({ error: "Goal name required" });
+
   if (!Number.isFinite(targetAmount) || targetAmount <= 0)
     return res.status(400).json({ error: "Invalid target amount" });
 
@@ -57,7 +53,8 @@ app.post("/goals/:id/contribute", (req, res) => {
   const { amount } = req.body;
 
   const goal = goals.find(g => g.id === id);
-  if (!goal) return res.status(404).json({ error: "Goal not found" });
+  if (!goal)
+    return res.status(404).json({ error: "Goal not found" });
 
   if (!Number.isFinite(amount) || amount <= 0)
     return res.status(400).json({ error: "Invalid amount" });
@@ -74,7 +71,7 @@ app.post("/goals/:id/contribute", (req, res) => {
   );
   goal.achieved = goal.currentAmount >= goal.targetAmount;
 
-  res.json({ message: "Added", goal });
+  res.json({ message: "Updated", goal });
 });
 
 app.delete("/goals/:id", (req, res) => {
@@ -89,9 +86,7 @@ app.delete("/goals/:id", (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-// =====================
-// WEEKS
-// =====================
+// ===================== WEEKS =====================
 app.get("/weeks", (req, res) => {
   res.json(weeks);
 });
@@ -126,9 +121,7 @@ app.post("/weeks", (req, res) => {
   res.status(201).json(week);
 });
 
-// =====================
-// SUMMARY
-// =====================
+// ===================== SUMMARY =====================
 app.get("/summary/all", (req, res) => {
   const totalWeeks = weeks.length;
 
@@ -149,7 +142,6 @@ app.get("/summary/all", (req, res) => {
 });
 
 // =====================
-const PORT = 3000;
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+app.listen(3000, () =>
+  console.log("Server running on http://localhost:3000")
 );

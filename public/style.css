@@ -23,8 +23,8 @@ body {
 input, button {
   padding: 8px;
   margin: 5px;
-  border-radius: 5px;
   border: none;
+  border-radius: 5px;
 }
 
 button {
@@ -50,4 +50,23 @@ button {
   padding: 10px;
   margin-top: 10px;
   border-radius: 8px;
+}
+
+.gauge {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, orange, gold);
+  transition: 0.3s;
+}
+
+.preview {
+  font-size: 12px;
+  color: #aaa;
 }
