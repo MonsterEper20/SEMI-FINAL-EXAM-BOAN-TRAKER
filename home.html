@@ -13,38 +13,21 @@
 <section class="card">
   <h2>+ NEW SAVINGS GOAL</h2>
   <div class="goal-form">
-    <input type="text" id="goal" placeholder="e.g. iPhone 16">
-    <input type="number" id="amount" placeholder="e.g. 5000">
+    <input id="goal" placeholder="Goal name">
+    <input id="amount" type="number" placeholder="Target amount">
     <button onclick="addGoal()">Add</button>
   </div>
 </section>
 
-<!-- STATUS MESSAGE -->
-<p id="statusMessage" style="text-align:center; color:green;"></p>
+<p id="statusMessage"></p>
 
-<!-- SUMMARY -->
 <section class="card">
   <h3>SUMMARY</h3>
   <div class="summary">
-    <div class="summary-box">
-      <p>Total Goals</p>
-      <h2 id="totalGoals">0</h2>
-    </div>
-
-    <div class="summary-box">
-      <p>Total Saved</p>
-      <h2 id="totalSaved">₱0</h2>
-    </div>
-
-    <div class="summary-box">
-      <p>Total Target</p>
-      <h2 id="totalTarget">₱0</h2>
-    </div>
-
-    <div class="summary-box">
-      <p>Progress</p>
-      <h2 id="overallProgress">0%</h2>
-    </div>
+    <div class="summary-box"><p>Total Goals</p><h2 id="totalGoals">0</h2></div>
+    <div class="summary-box"><p>Total Saved</p><h2 id="totalSaved">₱0</h2></div>
+    <div class="summary-box"><p>Total Target</p><h2 id="totalTarget">₱0</h2></div>
+    <div class="summary-box"><p>Progress</p><h2 id="overallProgress">0%</h2></div>
   </div>
 </section>
 
@@ -54,141 +37,95 @@
 </section>
 
 <script>
-async function loadGoals() {
-  const res = await fetch("/goals");
+const API = "";
+
+function show(msg, err=false){
+  const el = document.getElementById("statusMessage");
+  el.innerText = msg;
+  el.style.color = err ? "red" : "lime";
+  setTimeout(()=>el.innerText="",3000);
+}
+
+async function loadGoals(){
+  const res = await fetch(API+"/goals");
   const data = await res.json();
 
+  let totalSaved=0, totalTarget=0;
+
   const list = document.getElementById("goalsList");
-  list.innerHTML = "";
+  list.innerHTML="";
 
-  let totalSaved = 0;
-  let totalTarget = 0;
+  data.forEach(g=>{
+    totalSaved+=g.currentAmount;
+    totalTarget+=g.targetAmount;
 
-  data.forEach(g => {
-    const percent = Math.round(g.progressPercent);
-
-    totalSaved += g.currentAmount;
-    totalTarget += g.targetAmount;
-
-    list.innerHTML += `
+    list.innerHTML+=`
       <div class="goal-item">
         <div class="goal-header">
-          <strong>${g.name}</strong>
+          <b>${g.name}</b>
           <span>₱${g.currentAmount} / ₱${g.targetAmount}</span>
         </div>
 
         <div class="progress-bar">
-          <div class="progress" style="width:${percent}%"></div>
+          <div class="progress" style="width:${g.progressPercent}%"></div>
         </div>
-
-        <p>${percent}% ${g.achieved ? "✅ Achieved" : ""}</p>
 
         <div class="add-save">
-          <input type="number" id="save-${g.id}" placeholder="₱ amount">
-          <button onclick="saveMoney(${g.id})">+ Add</button>
-          <button onclick="deleteGoal(${g.id})">Delete</button>
+          <input id="save-${g.id}" type="number" placeholder="amount">
+          <button onclick="addMoney(${g.id})">+ Add</button>
+          <button onclick="delGoal(${g.id})">Delete</button>
         </div>
-      </div>
-    `;
+      </div>`;
   });
 
-  // SUMMARY
-  const totalGoals = data.length;
-  const overallPercent = totalTarget
-    ? Math.round((totalSaved / totalTarget) * 100)
-    : 0;
-
-  document.getElementById("totalGoals").innerText = totalGoals;
-  document.getElementById("totalSaved").innerText = `₱${totalSaved}`;
-  document.getElementById("totalTarget").innerText = `₱${totalTarget}`;
-  document.getElementById("overallProgress").innerText = `${overallPercent}%`;
+  document.getElementById("totalGoals").innerText=data.length;
+  document.getElementById("totalSaved").innerText="₱"+totalSaved;
+  document.getElementById("totalTarget").innerText="₱"+totalTarget;
+  document.getElementById("overallProgress").innerText=
+    totalTarget?Math.round(totalSaved/totalTarget*100)+"%":"0%";
 }
 
-async function addGoal() {
-  const goal = document.getElementById("goal").value;
-  const amount = Number(document.getElementById("amount").value);
+async function addGoal(){
+  const name=document.getElementById("goal").value;
+  const targetAmount=Number(document.getElementById("amount").value);
 
-  if (!goal || !amount) {
-    showMessage("Fill all fields", true);
-    return;
-  }
-
-  const res = await fetch("/goals", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: goal,
-      targetAmount: amount
-    })
+  const res=await fetch(API+"/goals",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({name,targetAmount})
   });
 
-  const data = await res.json();
+  const data=await res.json();
+  if(!res.ok) return show(data.error,true);
 
-  if (!res.ok) {
-    showMessage(data.error, true);
-    return;
-  }
-
-  showMessage("Goal added successfully");
-
-  document.getElementById("goal").value = "";
-  document.getElementById("amount").value = "";
-
+  show("Goal added");
   loadGoals();
 }
 
-async function saveMoney(id) {
-  const value = Number(document.getElementById(`save-${id}`).value);
+async function addMoney(id){
+  const amount=Number(document.getElementById(`save-${id}`).value);
 
-  if (!value) {
-    showMessage("Enter amount", true);
-    return;
-  }
-
-  const res = await fetch(`/goals/${id}/contribute`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: value })
+  const res=await fetch(API+`/goals/${id}/contribute`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({amount})
   });
 
-  const data = await res.json();
+  const data=await res.json();
+  if(!res.ok) return show(data.error,true);
 
-  if (!res.ok) {
-    showMessage(data.error, true);
-    return;
-  }
-
-  showMessage("Money added");
-
+  show("Added");
   loadGoals();
 }
 
-async function deleteGoal(id) {
-  const res = await fetch(`/goals/${id}`, {
-    method: "DELETE"
-  });
+async function delGoal(id){
+  const res=await fetch(API+`/goals/${id}`,{method:"DELETE"});
+  const data=await res.json();
 
-  const data = await res.json();
+  if(!res.ok) return show(data.error,true);
 
-  if (!res.ok) {
-    showMessage(data.error, true);
-    return;
-  }
-
-  showMessage("Goal deleted");
-
+  show("Deleted");
   loadGoals();
-}
-
-// MESSAGE HANDLER
-function showMessage(msg, isError = false) {
-  const el = document.getElementById("statusMessage");
-  el.innerText = msg;
-  el.style.color = isError ? "red" : "green";
-
-  setTimeout(() => {
-    el.innerText = "";
-  }, 3000);
 }
 
 loadGoals();
