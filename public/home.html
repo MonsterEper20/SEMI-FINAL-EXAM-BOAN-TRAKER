@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>BaonTracker</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -10,125 +10,161 @@
   <h1><span class="accent">Baon</span>Tracker</h1>
 </header>
 
+<!-- GOALS -->
 <section class="card">
-  <h2>+ NEW SAVINGS GOAL</h2>
-  <div class="goal-form">
-    <input id="goal" placeholder="Goal name">
-    <input id="amount" type="number" placeholder="Target amount">
-    <button onclick="addGoal()">Add</button>
-  </div>
+  <h2>NEW GOAL</h2>
+  <input id="goal" placeholder="Goal name">
+  <input id="amount" type="number" placeholder="Target amount">
+  <button onclick="addGoal()">Add Goal</button>
 </section>
 
-<p id="statusMessage"></p>
+<!-- WEEK -->
+<section class="card">
+  <h2>WEEKLY LOG</h2>
+  <input id="weekLabel" placeholder="Week label">
+  <input id="allowance" type="number" placeholder="Allowance">
+  <input id="spent" type="number" placeholder="Spent">
+  <input id="saveTarget" type="number" placeholder="Save target">
+  <button onclick="addWeek()">Add Week</button>
+</section>
 
+<p id="status"></p>
+
+<!-- SUMMARY -->
 <section class="card">
   <h3>SUMMARY</h3>
+
   <div class="summary">
-    <div class="summary-box"><p>Total Goals</p><h2 id="totalGoals">0</h2></div>
-    <div class="summary-box"><p>Total Saved</p><h2 id="totalSaved">₱0</h2></div>
-    <div class="summary-box"><p>Total Target</p><h2 id="totalTarget">₱0</h2></div>
-    <div class="summary-box"><p>Progress</p><h2 id="overallProgress">0%</h2></div>
+    <div class="summary-box"><p>Weeks</p><h2 id="totalWeeks">0</h2></div>
+    <div class="summary-box"><p>Allowance</p><h2 id="totalAllowance">₱0</h2></div>
+    <div class="summary-box"><p>Spent</p><h2 id="totalSpent">₱0</h2></div>
+    <div class="summary-box"><p>Saved</p><h2 id="totalSaved">₱0</h2></div>
+    <div class="summary-box"><p>Met</p><h2 id="weeksMetTarget">0</h2></div>
+    <div class="summary-box"><p>Missed</p><h2 id="weeksMissed">0</h2></div>
   </div>
 </section>
 
+<!-- GOALS LIST -->
 <section class="card">
-  <h3>MY GOALS</h3>
-  <div id="goalsList"></div>
+  <h3>GOALS</h3>
+  <div id="goalList"></div>
+</section>
+
+<!-- WEEK LIST -->
+<section class="card">
+  <h3>WEEKS</h3>
+  <div id="weekList"></div>
 </section>
 
 <script>
-const API = "";
-
-function show(msg, err=false){
-  const el = document.getElementById("statusMessage");
-  el.innerText = msg;
-  el.style.color = err ? "red" : "lime";
-  setTimeout(()=>el.innerText="",3000);
+async function loadAll(){
+  loadGoals();
+  loadWeeks();
+  loadSummary();
 }
 
+// ================= GOALS =================
 async function loadGoals(){
-  const res = await fetch(API+"/goals");
+  const res = await fetch("/goals");
   const data = await res.json();
 
-  let totalSaved=0, totalTarget=0;
-
-  const list = document.getElementById("goalsList");
-  list.innerHTML="";
+  const list = document.getElementById("goalList");
+  list.innerHTML = "";
 
   data.forEach(g=>{
-    totalSaved+=g.currentAmount;
-    totalTarget+=g.targetAmount;
-
-    list.innerHTML+=`
+    list.innerHTML += `
       <div class="goal-item">
-        <div class="goal-header">
-          <b>${g.name}</b>
-          <span>₱${g.currentAmount} / ₱${g.targetAmount}</span>
-        </div>
+        <b>${g.name}</b>
+        <p>₱${g.currentAmount} / ₱${g.targetAmount}</p>
 
-        <div class="progress-bar">
-          <div class="progress" style="width:${g.progressPercent}%"></div>
-        </div>
-
-        <div class="add-save">
-          <input id="save-${g.id}" type="number" placeholder="amount">
-          <button onclick="addMoney(${g.id})">+ Add</button>
-          <button onclick="delGoal(${g.id})">Delete</button>
-        </div>
-      </div>`;
+        <input id="g-${g.id}" type="number">
+        <button onclick="addMoney(${g.id})">Add</button>
+        <button onclick="delGoal(${g.id})">Delete</button>
+      </div>
+    `;
   });
-
-  document.getElementById("totalGoals").innerText=data.length;
-  document.getElementById("totalSaved").innerText="₱"+totalSaved;
-  document.getElementById("totalTarget").innerText="₱"+totalTarget;
-  document.getElementById("overallProgress").innerText=
-    totalTarget?Math.round(totalSaved/totalTarget*100)+"%":"0%";
 }
 
 async function addGoal(){
-  const name=document.getElementById("goal").value;
-  const targetAmount=Number(document.getElementById("amount").value);
+  const name = goal.value;
+  const targetAmount = Number(amount.value);
 
-  const res=await fetch(API+"/goals",{
+  await fetch("/goals", {
     method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({name,targetAmount})
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({name, targetAmount})
   });
 
-  const data=await res.json();
-  if(!res.ok) return show(data.error,true);
-
-  show("Goal added");
-  loadGoals();
+  loadAll();
 }
 
 async function addMoney(id){
-  const amount=Number(document.getElementById(`save-${id}`).value);
+  const amount = Number(document.getElementById(`g-${id}`).value);
 
-  const res=await fetch(API+`/goals/${id}/contribute`,{
+  await fetch(`/goals/${id}/contribute`, {
     method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({amount})
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({amount})
   });
 
-  const data=await res.json();
-  if(!res.ok) return show(data.error,true);
-
-  show("Added");
-  loadGoals();
+  loadAll();
 }
 
 async function delGoal(id){
-  const res=await fetch(API+`/goals/${id}`,{method:"DELETE"});
-  const data=await res.json();
-
-  if(!res.ok) return show(data.error,true);
-
-  show("Deleted");
-  loadGoals();
+  await fetch(`/goals/${id}`, { method:"DELETE" });
+  loadAll();
 }
 
-loadGoals();
+// ================= WEEKS =================
+async function loadWeeks(){
+  const res = await fetch("/weeks");
+  const data = await res.json();
+
+  const list = document.getElementById("weekList");
+  list.innerHTML = "";
+
+  data.forEach(w=>{
+    list.innerHTML += `
+      <div class="goal-item">
+        <b>${w.weekLabel}</b>
+        <p>Allowance: ₱${w.allowance}</p>
+        <p>Spent: ₱${w.spent}</p>
+        <p>Saved: ₱${w.saved}</p>
+        <p>${w.metTarget ? "✅ Met" : "❌ Missed"}</p>
+      </div>
+    `;
+  });
+}
+
+async function addWeek(){
+  const weekLabel = document.getElementById("weekLabel").value;
+  const allowance = Number(document.getElementById("allowance").value);
+  const spent = Number(document.getElementById("spent").value);
+  const saveTarget = Number(document.getElementById("saveTarget").value);
+
+  await fetch("/weeks", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({weekLabel, allowance, spent, saveTarget})
+  });
+
+  loadAll();
+}
+
+// ================= SUMMARY =================
+async function loadSummary(){
+  const res = await fetch("/summary/all");
+  const d = await res.json();
+
+  totalWeeks.innerText = d.totalWeeks;
+  totalAllowance.innerText = "₱"+d.totalAllowance;
+  totalSpent.innerText = "₱"+d.totalSpent;
+  totalSaved.innerText = "₱"+d.totalSaved;
+  weeksMetTarget.innerText = d.weeksMetTarget;
+  weeksMissed.innerText = d.weeksMissed;
+}
+
+loadAll();
 </script>
 
 </body>

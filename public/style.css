@@ -1,176 +1,53 @@
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: linear-gradient(#0f1720, #0b0f14);
+  font-family: Arial;
+  background: #0f1720;
   color: white;
 }
 
-/* TOP BAR */
 .topbar {
-  padding: 20px 40px;
+  padding: 20px;
 }
 
 .accent {
-  color: #f5a623;
+  color: orange;
 }
 
-/* CARD */
 .card {
   background: #141a22;
-  margin: 20px 40px;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #222;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-/* FORM */
-.goal-form {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.goal-form input {
-  padding: 10px;
-  background: #1b222b;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 6px;
-  outline: none;
-}
-
-.goal-form input:focus {
-  border-color: #f5a623;
-}
-
-.goal-form button {
-  padding: 10px 15px;
-  background: #f5a623;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-.goal-form button:hover {
-  background: #ffb84d;
-  transform: scale(1.05);
-}
-
-/* GOAL ITEM */
-.goal-item {
-  margin-top: 20px;
+  margin: 20px;
   padding: 15px;
-  background: #1b222b;
   border-radius: 10px;
-  transition: 0.2s;
 }
 
-.goal-item:hover {
-  transform: translateY(-2px);
-}
-
-/* HEADER */
-.goal-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-/* PROGRESS */
-.progress-bar {
-  background: #333;
-  height: 8px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress {
-  height: 8px;
-  background: #f5a623;
-  transition: 0.3s;
-  box-shadow: 0 0 8px #f5a623;
-}
-
-/* INPUT + BUTTONS */
-.add-save {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.add-save input {
+input, button {
   padding: 8px;
-  background: #141a22;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 6px;
-  outline: none;
-}
-
-.add-save input:focus {
-  border-color: #f5a623;
-}
-
-.add-save button {
-  padding: 8px 12px;
-  background: #f5a623;
+  margin: 5px;
+  border-radius: 5px;
   border: none;
-  border-radius: 6px;
+}
+
+button {
+  background: orange;
   cursor: pointer;
-  transition: 0.2s;
 }
 
-.add-save button:hover {
-  background: #ffb84d;
-  transform: scale(1.05);
-}
-
-/* DELETE BUTTON (important UX) */
-.add-save button:last-child {
-  background: #ff4d4d;
-}
-
-.add-save button:last-child:hover {
-  background: #ff6666;
-}
-
-/* SUMMARY */
 .summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
-  margin-top: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .summary-box {
   background: #1b222b;
-  padding: 15px;
-  border-radius: 10px;
+  padding: 10px;
+  border-radius: 8px;
   text-align: center;
-  transition: 0.2s;
 }
 
-.summary-box:hover {
-  transform: translateY(-3px);
-}
-
-.summary-box p {
-  margin: 0;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.summary-box h2 {
-  margin: 5px 0 0;
-  color: #f5a623;
-}
-
-/* STATUS MESSAGE */
-#statusMessage {
+.goal-item {
+  background: #1b222b;
+  padding: 10px;
   margin-top: 10px;
-  font-weight: bold;
+  border-radius: 8px;
 }

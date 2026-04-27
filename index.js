@@ -3,38 +3,46 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// =========================
-// HELPERS
-// =========================
-const send400 = (res, msg) => res.status(400).json({ error: msg });
-const send404 = (res, msg) => res.status(404).json({ error: msg });
-
-// =========================
+// =====================
 // DATA
-// =========================
-let weeks = [];
+// =====================
 let goals = [];
+let weeks = [];
 
-let weekId = 1;
 let goalId = 1;
+let weekId = 1;
 
-// =========================
+// =====================
+// HELPERS
+// =====================
+const bad = (res, msg) => res.status(400).json({ error: msg });
+const notFound = (res, msg) => res.status(404).json({ error: msg });
+
+// =====================
+// FRONTEND
+// =====================
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
+// =====================
 // GOALS
-// =========================
+// =====================
 app.get("/goals", (req, res) => {
-  res.status(200).json(goals);
+  res.json(goals);
 });
 
 app.post("/goals", (req, res) => {
   const { name, targetAmount } = req.body;
 
-  if (!name) return send400(res, "Goal name required");
+  if (!name) return bad(res, "Goal name required");
   if (!Number.isFinite(targetAmount) || targetAmount <= 0)
-    return send400(res, "Invalid target amount");
+    return bad(res, "Invalid target amount");
 
   const goal = {
     id: goalId++,
@@ -55,13 +63,13 @@ app.post("/goals/:id/contribute", (req, res) => {
   const { amount } = req.body;
 
   const goal = goals.find(g => g.id === id);
-  if (!goal) return send404(res, "Goal not found");
+  if (!goal) return notFound(res, "Goal not found");
 
   if (!Number.isFinite(amount) || amount <= 0)
-    return send400(res, "Invalid amount");
+    return bad(res, "Invalid amount");
 
   if (goal.achieved)
-    return send400(res, "Goal already achieved");
+    return bad(res, "Goal already achieved");
 
   goal.currentAmount += amount;
 
@@ -72,36 +80,36 @@ app.post("/goals/:id/contribute", (req, res) => {
   );
   goal.achieved = goal.currentAmount >= goal.targetAmount;
 
-  res.status(200).json({ message: "Added", goal });
+  res.json({ message: "Added", goal });
 });
 
 app.delete("/goals/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const initial = goals.length;
+  const before = goals.length;
   goals = goals.filter(g => g.id !== id);
 
-  if (goals.length === initial)
-    return send404(res, "Goal not found");
+  if (before === goals.length)
+    return notFound(res, "Goal not found");
 
-  res.status(200).json({ message: "Deleted" });
+  res.json({ message: "Deleted" });
 });
 
-// =========================
+// =====================
 // WEEKS
-// =========================
+// =====================
 app.get("/weeks", (req, res) => {
-  res.status(200).json(weeks);
+  res.json(weeks);
 });
 
 app.post("/weeks", (req, res) => {
   const { weekLabel, allowance, spent, saveTarget } = req.body;
 
-  if (!weekLabel) return send400(res, "Week label required");
+  if (!weekLabel) return bad(res, "Week label required");
   if (!Number.isFinite(allowance) || allowance <= 0)
-    return send400(res, "Invalid allowance");
+    return bad(res, "Invalid allowance");
   if (!Number.isFinite(spent) || spent < 0 || spent > allowance)
-    return send400(res, "Invalid spent");
+    return bad(res, "Invalid spent");
 
   const saved = allowance - spent;
   const metTarget = saved >= saveTarget;
@@ -121,9 +129,9 @@ app.post("/weeks", (req, res) => {
   res.status(201).json(week);
 });
 
-// =========================
+// =====================
 // SUMMARY
-// =========================
+// =====================
 app.get("/summary/all", (req, res) => {
   const totalWeeks = weeks.length;
 
@@ -133,7 +141,7 @@ app.get("/summary/all", (req, res) => {
 
   const weeksMetTarget = weeks.filter(w => w.metTarget).length;
 
-  res.status(200).json({
+  res.json({
     totalWeeks,
     totalAllowance,
     totalSpent,
@@ -143,14 +151,7 @@ app.get("/summary/all", (req, res) => {
   });
 });
 
-// =========================
-// FRONTEND ROUTE
-// =========================
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/home.html"));
-});
-
-// =========================
+// =====================
 const PORT = 3000;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
