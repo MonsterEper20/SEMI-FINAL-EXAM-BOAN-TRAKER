@@ -8,19 +8,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ===================== DATA =====================
+
 let goals = [];
 let weeks = [];
 
 let goalId = 1;
 let weekId = 1;
 
-// ===================== FRONTEND =====================
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/home.html"));
 });
 
-// ===================== GOALS =====================
+
 app.get("/goals", (req, res) => {
   res.json(goals);
 });
@@ -86,7 +86,7 @@ app.delete("/goals/:id", (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-// ===================== WEEKS =====================
+
 app.get("/weeks", (req, res) => {
   res.json(weeks);
 });
@@ -121,7 +121,7 @@ app.post("/weeks", (req, res) => {
   res.status(201).json(week);
 });
 
-// ===================== SUMMARY =====================
+
 app.get("/summary/all", (req, res) => {
   const totalWeeks = weeks.length;
 
@@ -141,7 +141,7 @@ app.get("/summary/all", (req, res) => {
   });
 });
 
-// =====================
+
 app.listen(3000, () =>
   console.log("Server running on http://localhost:3000")
 );
