@@ -5,6 +5,7 @@ body {
   color: white;
 }
 
+/* TOP BAR */
 .topbar {
   padding: 20px 40px;
 }
@@ -13,14 +14,17 @@ body {
   color: #f5a623;
 }
 
+/* CARD */
 .card {
   background: #141a22;
   margin: 20px 40px;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #222;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
+/* FORM */
 .goal-form {
   display: flex;
   gap: 10px;
@@ -33,6 +37,11 @@ body {
   border: 1px solid #333;
   color: white;
   border-radius: 6px;
+  outline: none;
+}
+
+.goal-form input:focus {
+  border-color: #f5a623;
 }
 
 .goal-form button {
@@ -41,21 +50,36 @@ body {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
+.goal-form button:hover {
+  background: #ffb84d;
+  transform: scale(1.05);
+}
+
+/* GOAL ITEM */
 .goal-item {
   margin-top: 20px;
   padding: 15px;
   background: #1b222b;
-  border-radius: 8px;
+  border-radius: 10px;
+  transition: 0.2s;
 }
 
+.goal-item:hover {
+  transform: translateY(-2px);
+}
+
+/* HEADER */
 .goal-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 
+/* PROGRESS */
 .progress-bar {
   background: #333;
   height: 8px;
@@ -67,12 +91,15 @@ body {
   height: 8px;
   background: #f5a623;
   transition: 0.3s;
+  box-shadow: 0 0 8px #f5a623;
 }
 
+/* INPUT + BUTTONS */
 .add-save {
   margin-top: 10px;
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .add-save input {
@@ -81,6 +108,11 @@ body {
   border: 1px solid #333;
   color: white;
   border-radius: 6px;
+  outline: none;
+}
+
+.add-save input:focus {
+  border-color: #f5a623;
 }
 
 .add-save button {
@@ -89,6 +121,21 @@ body {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-save button:hover {
+  background: #ffb84d;
+  transform: scale(1.05);
+}
+
+/* DELETE BUTTON (important UX) */
+.add-save button:last-child {
+  background: #ff4d4d;
+}
+
+.add-save button:last-child:hover {
+  background: #ff6666;
 }
 
 /* SUMMARY */
@@ -102,8 +149,13 @@ body {
 .summary-box {
   background: #1b222b;
   padding: 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
+  transition: 0.2s;
+}
+
+.summary-box:hover {
+  transform: translateY(-3px);
 }
 
 .summary-box p {
@@ -115,4 +167,10 @@ body {
 .summary-box h2 {
   margin: 5px 0 0;
   color: #f5a623;
+}
+
+/* STATUS MESSAGE */
+#statusMessage {
+  margin-top: 10px;
+  font-weight: bold;
 }
