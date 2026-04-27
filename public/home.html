@@ -28,8 +28,6 @@
   <button onclick="addWeek()">Add Week</button>
 </section>
 
-<p id="status"></p>
-
 <!-- SUMMARY -->
 <section class="card">
   <h3>SUMMARY</h3>
@@ -52,7 +50,7 @@
 
 <!-- WEEK LIST -->
 <section class="card">
-  <h3>WEEKS</h3>
+  <h3>WEEK LOGS</h3>
   <div id="weekList"></div>
 </section>
 
@@ -79,7 +77,7 @@ async function loadGoals(){
 
         <input id="g-${g.id}" type="number">
         <button onclick="addMoney(${g.id})">Add</button>
-        <button onclick="delGoal(${g.id})">Delete</button>
+        <button onclick="deleteGoal(${g.id})">Delete</button>
       </div>
     `;
   });
@@ -110,7 +108,7 @@ async function addMoney(id){
   loadAll();
 }
 
-async function delGoal(id){
+async function deleteGoal(id){
   await fetch(`/goals/${id}`, { method:"DELETE" });
   loadAll();
 }

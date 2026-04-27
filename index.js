@@ -18,16 +18,10 @@ let goalId = 1;
 let weekId = 1;
 
 // =====================
-// HELPERS
-// =====================
-const bad = (res, msg) => res.status(400).json({ error: msg });
-const notFound = (res, msg) => res.status(404).json({ error: msg });
-
-// =====================
-// FRONTEND
+// FRONTEND ROUTE (HOME.HTML NOW)
 // =====================
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/index.html"));
+  res.sendFile(path.join(__dirname, "public/home.html"));
 });
 
 // =====================
@@ -40,9 +34,9 @@ app.get("/goals", (req, res) => {
 app.post("/goals", (req, res) => {
   const { name, targetAmount } = req.body;
 
-  if (!name) return bad(res, "Goal name required");
+  if (!name) return res.status(400).json({ error: "Goal name required" });
   if (!Number.isFinite(targetAmount) || targetAmount <= 0)
-    return bad(res, "Invalid target amount");
+    return res.status(400).json({ error: "Invalid target amount" });
 
   const goal = {
     id: goalId++,
@@ -63,13 +57,13 @@ app.post("/goals/:id/contribute", (req, res) => {
   const { amount } = req.body;
 
   const goal = goals.find(g => g.id === id);
-  if (!goal) return notFound(res, "Goal not found");
+  if (!goal) return res.status(404).json({ error: "Goal not found" });
 
   if (!Number.isFinite(amount) || amount <= 0)
-    return bad(res, "Invalid amount");
+    return res.status(400).json({ error: "Invalid amount" });
 
   if (goal.achieved)
-    return bad(res, "Goal already achieved");
+    return res.status(400).json({ error: "Goal already achieved" });
 
   goal.currentAmount += amount;
 
@@ -90,7 +84,7 @@ app.delete("/goals/:id", (req, res) => {
   goals = goals.filter(g => g.id !== id);
 
   if (before === goals.length)
-    return notFound(res, "Goal not found");
+    return res.status(404).json({ error: "Goal not found" });
 
   res.json({ message: "Deleted" });
 });
@@ -105,11 +99,14 @@ app.get("/weeks", (req, res) => {
 app.post("/weeks", (req, res) => {
   const { weekLabel, allowance, spent, saveTarget } = req.body;
 
-  if (!weekLabel) return bad(res, "Week label required");
+  if (!weekLabel)
+    return res.status(400).json({ error: "Week label required" });
+
   if (!Number.isFinite(allowance) || allowance <= 0)
-    return bad(res, "Invalid allowance");
+    return res.status(400).json({ error: "Invalid allowance" });
+
   if (!Number.isFinite(spent) || spent < 0 || spent > allowance)
-    return bad(res, "Invalid spent");
+    return res.status(400).json({ error: "Invalid spent" });
 
   const saved = allowance - spent;
   const metTarget = saved >= saveTarget;
